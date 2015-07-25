@@ -5,7 +5,7 @@ var sliderWidth: HTMLInputElement
 var isMousePressed = false
 var mousePrevPosition: any = null
 
-var maxNumVertices = 50000;
+var maxNumVertices = 100000;
 var index = 0
 
 window.onload = () => {
@@ -147,12 +147,18 @@ window.onload = () => {
             {
                 var dPixels = i * dPixelsValue
 
-                var p1 = getCoordinatesRight(mousePrevPosition, sign(i) * 90.0, dPixels)
-                var p2 = getCoordinatesRight(mouseCurrentPosition, sign(i) * 90.0, dPixels)
-
-                //var p1 = ToCanvasCoordinates(vec2(mousePrevPosition[0] + dPixels, mousePrevPosition[1] + dPixels))
-                //var p2 = ToCanvasCoordinates(vec2(mouseCurrentPosition[0] + dPixels, mouseCurrentPosition[1] + dPixels))
-                addLine(p1, p2)                    
+                if (lineWidth > 4)
+                {
+                    var p1 = ToCanvasCoordinates(vec2(mousePrevPosition[0] + dPixels, mousePrevPosition[1] + dPixels))
+                    var p2 = ToCanvasCoordinates(vec2(mouseCurrentPosition[0] + dPixels, mouseCurrentPosition[1] + dPixels))
+                    addLine(p1, p2)
+                }
+                else
+                {
+                    var p1 = getCoordinatesRight(mousePrevPosition, sign(i) * 90.0, dPixels)
+                    var p2 = getCoordinatesRight(mouseCurrentPosition, sign(i) * 90.0, dPixels)
+                    addLine(p1, p2)  
+                }
             }
         }
 
