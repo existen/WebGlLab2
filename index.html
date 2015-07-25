@@ -1,0 +1,77 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>TypeScript HTML App</title>
+    <script src="webgl-utils.js"></script>
+    <script src="initShaders.js"></script>
+    <script src="flatten.js"></script>
+    <script src="MV.js"></script>
+    <script src="app.js"></script>
+
+
+    <script id="vertex-shader" type="x-shader/x-vertex">
+        //attribute - passed to vertex shader from gl.bufferData(js) per vertex; vPosition, vColor
+        attribute vec4 vPosition;
+        attribute vec4 vColor;
+        varying vec4 fColor;
+
+        void main()
+        {
+            gl_Position = vPosition;
+            fColor = vColor;
+        }
+    </script>
+    <script id="fragment-shader" type="x-shader/x-fragment">
+        #ifdef GL_FRAGMENT_SHADER_PRECISION_HIGH
+        precision highp float;
+        #else
+        precision mediump float;
+        #endif
+
+        //varying qualifiers replaced by in and out
+        //varying - passed from vertex shader to fragment shader; autimatically interpolated by rasterizer
+        //varying vec4 fColor - in both shaders
+
+        //uniform - constants in both  shaders
+
+        //x,y,z,w;r,g,b,a;s,t,p,q;a[0]-a[3]
+        //swizzling - a.yz = vec2(.. .)
+
+        varying vec4 fColor; //interpolated values of color
+
+        void main()
+        {
+            gl_FragColor.rgb = fColor.rgb; //vec4(1.0, 0.0, 0.0, 1.0);
+            gl_FragColor.a = 1.0;
+        }
+    </script>
+    <script type="text/javascript" src="../Common/webgl-utils.js"></script>
+    <script type="text/javascript" src="../Common/initShaders.js"></script>
+    <script type="text/javascript" src="../Common/flatten.js"></script>
+    <script type="text/javascript" src="../Common/MV.js"></script>
+    <script type="text/javascript" src="triangle.js"></script>
+</head>
+<body>
+    <div>Color
+        <select id="boxColor">
+            <option value="100">Red</option>
+            <option value="010">Green</option>
+            <option value="001">Blue</option>
+            <option value="110">Yellow</option>
+            <option value="101">Magenta</option>
+            <option value="011">Cyan</option>
+            <option value="000">Black</option>
+        </select>
+    </div>
+
+    <div>Width
+        <input id="sliderWidth" type="range" min="1" max="10" step="1" value="3" />
+    </div>
+
+    <canvas id="gl-canvas" width="512" height="512">
+        Oops ... your browser doesn't support the HTML5 canvas element111
+    </canvas>
+</body>
+</html>
