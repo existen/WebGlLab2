@@ -3,11 +3,10 @@
 var boxColor: HTMLSelectElement
 var sliderWidth: HTMLInputElement
 var isMousePressed = false
-var penPrevPosition : any = null
+var mousePrevPosition: any = null
 
 var maxNumVertices = 50000;
 var index = 0
-var linesWidth : number[] = []
 
 window.onload = () => {
 
@@ -92,7 +91,27 @@ window.onload = () => {
     canvas.onmouseup = () =>
     {
         isMousePressed = false
-        penPrevPosition = null
+        mousePrevPosition = null
+    }
+
+    function ToCanvasCoordinates(mousePos: number[]): number[]
+    {
+        return vec2(2 * mousePos[0] / canvas.width - 1,
+            2 * (canvas.height - mousePos[1]) / canvas.height - 1)
+    }
+
+    function addLine(pos1: number[], pos2: number[])
+    {
+        gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
+        gl.bufferSubData(gl.ARRAY_BUFFER, 8 * index, flatten(pos1));
+        gl.bufferSubData(gl.ARRAY_BUFFER, 8 * (index + 1), flatten(pos2));
+
+        var currentColor = vec4(+boxColor.value[0], +boxColor.value[1], +boxColor.value[2], 1)
+        gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
+        gl.bufferSubData(gl.ARRAY_BUFFER, 16 * index, flatten(currentColor));
+        gl.bufferSubData(gl.ARRAY_BUFFER, 16 * (index + 1), flatten(currentColor));
+
+        index += 2
     }
 
     canvas.onmousemove = event =>
@@ -100,29 +119,16 @@ window.onload = () => {
         if (!isMousePressed)
             return
 
-        var penCurrentPosition = vec2(2 * event.offsetX / canvas.width - 1,
-            2 * (canvas.height - event.offsetY) / canvas.height - 1)
+        var mouseCurrentPosition = vec2(event.offsetX, event.offsetY)
 
-        if (penPrevPosition != null)
+        if (mousePrevPosition != null)
         {
-            //
-            gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-            gl.bufferSubData(gl.ARRAY_BUFFER, 8 * index, flatten(penPrevPosition));
-            gl.bufferSubData(gl.ARRAY_BUFFER, 8 * (index + 1), flatten(penCurrentPosition));
-
-            var currentColor = vec4(+boxColor.value[0], +boxColor.value[1], +boxColor.value[2], 1)
-            gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-            gl.bufferSubData(gl.ARRAY_BUFFER, 16 * index, flatten(currentColor));
-            gl.bufferSubData(gl.ARRAY_BUFFER, 16 * (index + 1), flatten(currentColor));
-
-            index += 2
-            //
+            addLine(ToCanvasCoordinates(mousePrevPosition), ToCanvasCoordinates(mouseCurrentPosition))
 
             var lineWidth = +sliderWidth.value
-            linesWidth.push(lineWidth)
         }
 
-        penPrevPosition = penCurrentPosition
+        mousePrevPosition = mouseCurrentPosition
     }
 
     render()
@@ -131,8 +137,6 @@ window.onload = () => {
 
 function render()
 {
-
-
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     //for (var i = 0; i < index; i += 4)
