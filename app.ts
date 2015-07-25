@@ -123,9 +123,15 @@ window.onload = () => {
 
         if (mousePrevPosition != null)
         {
-            addLine(ToCanvasCoordinates(mousePrevPosition), ToCanvasCoordinates(mouseCurrentPosition))
-
             var lineWidth = +sliderWidth.value
+
+            for (var i = -lineWidth+1; i <= lineWidth-1; ++i)
+            {
+                var dPixels = i*0.7
+                var p1 = ToCanvasCoordinates(vec2(mousePrevPosition[0] + dPixels, mousePrevPosition[1] + dPixels))
+                var p2 = ToCanvasCoordinates(vec2(mouseCurrentPosition[0] + dPixels, mouseCurrentPosition[1] + dPixels))
+                addLine(p1, p2)                    
+            }
         }
 
         mousePrevPosition = mouseCurrentPosition
@@ -142,10 +148,12 @@ function render()
     //for (var i = 0; i < index; i += 4)
     //    gl.drawArrays(gl.TRIANGLE_FAN, i, 4);
 
-    for (var i = 0; i < index; i += 2)
-    {
-        gl.drawArrays(gl.LINES, i, 2)
-    }
+    //for (var i = 0; i < index; i += 2)
+    //{
+    //    gl.drawArrays(gl.LINES, i, 2)
+    //}
+
+    gl.drawArrays(gl.LINES, 0, index)
 
     window.requestAnimationFrame(render);
 }
