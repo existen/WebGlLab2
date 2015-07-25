@@ -114,6 +114,16 @@ window.onload = () => {
         index += 2
     }
 
+    function GetAngleOfLineBetweenTwoPoints(p1: number[], p2: number[])
+    {
+        return Math.atan2(p2[1] - p1[1], p2[0] - p1[0]) * (180.0 / Math.PI);
+    }
+
+    function sign(p: number)
+    {
+        return p < 0 ? -1 : (p > 0 ? 1 : 0)
+    }
+
     canvas.onmousemove = event =>
     {
         if (!isMousePressed)
@@ -125,11 +135,23 @@ window.onload = () => {
         {
             var lineWidth = +sliderWidth.value
 
+            var lineAngle = GetAngleOfLineBetweenTwoPoints(mouseCurrentPosition, mousePrevPosition)
+            var dPixelsValue = 0.7
+
+            var getCoordinatesRight = (mousePosition : number[], dAngle: number, dPixels : number) =>
+            {
+                return ToCanvasCoordinates(vec2(mousePosition[0] + dPixels * Math.cos(radians(lineAngle + dAngle))
+                    , mousePosition[1] + dPixels * Math.sin(radians(lineAngle + dAngle))))
+            }
             for (var i = -lineWidth+1; i <= lineWidth-1; ++i)
             {
-                var dPixels = i*0.7
-                var p1 = ToCanvasCoordinates(vec2(mousePrevPosition[0] + dPixels, mousePrevPosition[1] + dPixels))
-                var p2 = ToCanvasCoordinates(vec2(mouseCurrentPosition[0] + dPixels, mouseCurrentPosition[1] + dPixels))
+                var dPixels = i * dPixelsValue
+
+                var p1 = getCoordinatesRight(mousePrevPosition, sign(i) * 90.0, dPixels)
+                var p2 = getCoordinatesRight(mouseCurrentPosition, sign(i) * 90.0, dPixels)
+
+                //var p1 = ToCanvasCoordinates(vec2(mousePrevPosition[0] + dPixels, mousePrevPosition[1] + dPixels))
+                //var p2 = ToCanvasCoordinates(vec2(mouseCurrentPosition[0] + dPixels, mouseCurrentPosition[1] + dPixels))
                 addLine(p1, p2)                    
             }
         }
